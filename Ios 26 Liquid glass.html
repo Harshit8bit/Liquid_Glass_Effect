@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Scroll Navigation Bar</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* --- 1. General Page Layout & Background --- */
+        html {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 150vh; /* Make body longer to enable scrolling */
+        }
+
+        .background-content {
+            
+            flex-grow: 1;
+            padding: 50px 20px 150px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.858);
+            background-size: 200% 200%;
+            animation: gradient-animation 10s ease infinite;
+            color: #000000;
+        }
+
+     
+
+        .background-content h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .background-content p {
+            max-width: 800px;
+            margin: 0 auto 15px;
+            line-height: 1.6;
+        }
+
+
+        /* --- 2. The Sticky Bottom Menu Container --- */
+        .menu-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+
+        }
+
+        .bottom-menu-bar {
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+            
+            background-color: rgba(255, 255, 255, 0.29);
+            backdrop-filter: blur(8px) saturate(120%);
+            -webkit-backdrop-filter: blur(8px) saturate(120%);
+            
+            border-radius: 30px;
+            
+              border: 1px solid rgba(255, 255, 255, 0);
+
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.57);
+
+
+            /* UPDATED: Triggers the new liquid-fall animation */
+            animation: liquid-fall 0.8s ease-out 0.5s forwards;
+
+        }
+                
+
+        /* --- 3. The Highlight Pill & Menu Items (UPDATED for liquid effect) --- */
+        
+        .blur-pill {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) scale(1); /* Initial state, no squash */
+            z-index: 1;
+            opacity: 0;
+            
+            background-color: rgba(255, 255, 255, 0.4); /* A soft, transparent blue for liquid */
+            border: none; /* Remove border for a softer liquid edge */
+            box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3); /* Soft blue glow */
+            border-radius: 25px;
+            
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother, bouncier transition */
+        }
+
+        /* NEW: Class to be added by JS when scrolling, for the "squash" effect */
+        .blur-pill.scrolling-liquid {
+            transform: translateY(-50%) scale(0.9, 1.1); /* Slightly squashed vertically, stretched horizontally */
+            opacity: 0.8; /* A bit more opaque when squashing */
+        }
+
+        .menu-item {
+            position: relative;
+            padding: 8px 15px;
+            color: rgba(0, 0, 0, 0.7);
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 2;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85em;
+            min-width: 60px;
+            transition: color 0.3s ease;
+        }
+
+        .menu-item.active {
+            color: #007aff;
+        }
+
+        .menu-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 24px;
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 1px;
+        }
+
+       /* --- UPDATED: Animation for the liquid drop effect --- */
+        @keyframes liquid-fall {
+            0% {
+                transform: translateY(150px) scale(0.8);
+                opacity: 0;
+            }
+            60% {
+                /* 'Impact' frame: Overshoots and squashes */
+                transform: translateY(-10px) scale(1.05, 0.95);
+                opacity: 1;
+            }
+            80% {
+                /* 'Rebound' frame: Bounces back up */
+                transform: translateY(5px) scale(0.98, 1.02);
+            }
+            100% {
+                /* 'Settle' frame: Final position */
+                transform: translateY(0) scale(1, 1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-content">
+        <h1>Liquid Scroll Navigation</h1>
+        <p>Scroll the page to see the liquid effect on the active highlight pill!</p>
+        <p>This is some extra content to make the page scrollable.</p>
+        <p>The blur pill will subtly squash and stretch, mimicking a liquid behavior as you scroll up and down.</p>
+        <p>Notice how the highlight deforms when scrolling, then gently returns to its normal state.</p>
+        <p>This adds a dynamic and engaging touch to the user interface, making it feel more alive.</p>
+        <p>Keep scrolling, and observe the interaction with the bottom navigation bar.</p>
+        <p>This effect combines CSS transformations with JavaScript event handling for a seamless experience.</p>
+        <p>The goal is to enhance the user experience with subtle, delightful animations.</p>
+        <p>More content to ensure the scrollbar is always present.</p>
+        <p>This further demonstrates the responsiveness of the liquid effect.</p>
+        <p>veral video games, 
+            <h1>Liquid Scroll Navigation</h1>
+        <p>Scroll the page to see the liquid effect on the active highlight pill!</p>
+        <p>This is some extra content to make the page scrollable.</p>
+        <p>The blur pill will subtly squash and stretch, mimicking a liquid behavior as you scroll up and down.</p>
+        <p>Notice how the highlight deforms when scrolling, then gently returns to its normal state.</p>
+        <p>This adds a dynamic and engaging touch to the user interface, making it feel more alive.</p>
+        <p>Keep scrolling, and observe the interaction with the bottom navigation bar.</p>
+        <p>This effect combines CSS transformations with JavaScript event handling for a seamless experience.</p>
+        <p>The goal is to enhance the user experience with subtle, delightful animations.</p>
+        <p>More content to ensure the scrollbar is always present.</p>
+        <p>This further demonstrates the responsiveness of the liquid effect.</p>
+        <p>veral video games, including Iron Man (2008) and Iron Man 2 (2010), which<h1>Liquid Scroll Navigation</h1>
+        <p>Scroll the page to see the liquid effect on the active highlight pill!</p>
+        <p>This is some extra content to make the page scrollable.</p>
+        <p>The blur pill will subtly squash and stretch, mimicking a liquid behavior as you scroll up and down.</p>
+        <p>Notice how the highlight deforms when scrolling, then gently returns to its normal state.</p>
+        <p>This adds a dynamic and engaging touch to the user interface, making it feel more alive.</p>
+        <p>Keep scrolling, and observe the interaction with the bottom navigation bar.</p>
+        <p>This effect combines CSS transformations with JavaScript event handling for a seamless experience.</p>
+        <p>The goal is to enhance the user experience with subtle, delightful animations.</p>
+        <p>More content to ensure the scrollbar is always present.</p>
+        <p>This further demonstrates the responsiveness of the liquid effect.</p>
+        <p>veral video games, including Iron Man (2008) and Iron Man 2 (2010), whichincluding Iron Man (2008) and Iron Man 2 (2010), which were released as adaptations of his Marvel Cinematic Universe films. He also featured in the PlayStation VR game Iron Man VR (2020). An Iron Man action-adventure game was announced in 2022 to be developed by Motive Studio. He also appeared in many other Marvel video games, such as those featuring the Avengers.[232]
+        </p>
+    </div>
+
+    <div class="menu-container">
+        <nav class="bottom-menu-bar">
+            <div class="blur-pill"></div>
+            <a href="#" class="menu-item active">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-grip"></i>
+                <span>Apps</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Docs</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Search</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBar = document.querySelector('.bottom-menu-bar');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const blurPill = document.querySelector('.blur-pill');
+            let currentActiveItem = null;
+
+            function positionBlurPill(targetItem) {
+                if (!targetItem) {
+                    blurPill.style.opacity = '0';
+                    if (currentActiveItem) { currentActiveItem.classList.remove('active'); }
+                    currentActiveItem = null;
+                    return;
+                }
+
+                if (currentActiveItem) { currentActiveItem.classList.remove('active'); }
+                targetItem.classList.add('active');
+                currentActiveItem = targetItem;
+
+                const itemRect = targetItem.getBoundingClientRect();
+                const menuBarRect = menuBar.getBoundingClientRect();
+                const left = itemRect.left - menuBarRect.left;
+                
+                blurPill.style.left = `${left}px`;
+                blurPill.style.width = `${itemRect.width}px`;
+                blurPill.style.height = `${itemRect.height}px`;
+                blurPill.style.opacity = '1';
+            }
+
+            const initiallyActiveItem = document.querySelector('.menu-item.active');
+            if (initiallyActiveItem) {
+                setTimeout(() => { positionBlurPill(initiallyActiveItem); }, 100);
+            }
+
+            menuBar.addEventListener('mousemove', (e) => {
+                const hoveredItem = e.target.closest('.menu-item');
+                if (hoveredItem && hoveredItem !== currentActiveItem) {
+                    positionBlurPill(hoveredItem);
+                }
+            });
+
+            menuBar.addEventListener('mouseleave', () => {
+                positionBlurPill(null);
+            });
+
+            // --- NEW: Scroll-triggered liquid effect on the blur-pill ---
+            let scrollTimer;
+            window.addEventListener('scroll', () => {
+                // Only apply the liquid effect if the pill is currently visible/active
+                if (blurPill.style.opacity === '1') {
+                    blurPill.classList.add('scrolling-liquid');
+
+                    clearTimeout(scrollTimer);
+
+                    scrollTimer = setTimeout(() => {
+                        blurPill.classList.remove('scrolling-liquid');
+                    }, 100); 
+                }
+            });
+        });
+    </script>
+</body>
+</html>
