@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS 26 - Magnetic Glare Navigation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        /* --- 1. General Page & New CSS Variables --- */
+        :root {
+            /* Control the glare effect */
+            --glare-x: 50%;
+            --glare-y: 50%;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 150vh;
+            background-color: #000000; /* Dark background for a futuristic feel */
+            color: #ffffff;
+        }
+
+        .background-content {
+            flex-grow: 1;
+            padding: 50px 20px 150px;
+            text-align: center;
+        }
+        .background-content h1 { font-size: 3em; margin-bottom: 20px; }
+        .background-content p { max-width: 800px; margin: 0 auto 15px; line-height: 1.6; }
+
+        /* --- 2. 3D Menu Container & Bar --- */
+        
+        .menu-container {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            /* This creates the 3D space for the parallax tilt effect */
+            perspective: 800px;
+        }
+
+        .bottom-menu-bar {
+            width: fit-content;
+            display: flex;
+            align-items: stretch; /* Stretch items to fill height */
+            padding: 0 10px; /* Padding for the ends */
+            position: relative;
+            background-color: rgba(30, 30, 30, 0.5);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            
+            /* This enables 3D transformations for children */
+            transform-style: preserve-3d;
+            /* Smooth transition for the tilt effect */
+            transition: transform 0.1s linear;
+        }
+
+        /* --- 3. The "Magnetic Glare" Pill & Menu Items --- */
+        
+        .blur-pill {
+            position: absolute;
+            top: 8px; /* Offset from top */
+            bottom: 8px; /* Offset from bottom */
+            z-index: 1;
+            opacity: 0;
+            border-radius: 20px;
+
+            /* The Glare Effect: A radial gradient positioned by CSS variables */
+            background-image: radial-gradient(
+                circle at var(--glare-x) var(--glare-y),
+                rgba(255, 255, 255, 0.8),
+                rgba(255, 255, 255, 0.2)
+            );
+
+            /* A fast, snappy transition for the 'magnetic docking' */
+            transition: left 0.2s cubic-bezier(0, 0, 0.2, 1), 
+                        width 0.2s cubic-bezier(0, 0, 0.2, 1),
+                        opacity 0.2s ease;
+        }
+
+        .menu-item {
+            position: relative;
+            padding: 8px 20px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 2;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            /* A subtle transition for the 'active' state color */
+            transition: color 0.2s ease;
+            transform: translateZ(20px); /* Lifts the items in 3D space */
+        }
+
+        .menu-item.active {
+            color: #fff; /* Active items are bright white */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-content">
+        <h1>"iOS 26" Magnetic Glare</h1>
+        
+    </div>    
+    <div class="menu-container">
+        <nav class="bottom-menu-bar">
+            <div class="blur-pill"></div>
+            <a href="#" class="menu-item active">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-grip"></i>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-file-lines"></i>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBar = document.querySelector('.bottom-menu-bar');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const blurPill = document.querySelector('.blur-pill');
+            let currentActiveItem = menuBar.querySelector('.active');
+
+            // --- Set initial pill position on page load ---
+            function setInitialPill() {
+                if (!currentActiveItem) return;
+                const itemRect = currentActiveItem.getBoundingClientRect();
+                const menuBarRect = menuBar.getBoundingClientRect();
+                
+                blurPill.style.left = `${itemRect.left - menuBarRect.left}px`;
+                blurPill.style.width = `${itemRect.width}px`;
+                blurPill.style.opacity = '1';
+            }
+            // Use a timeout to ensure all elements are rendered
+            setTimeout(setInitialPill, 100);
+
+            // --- Main Mousemove Listener for all effects ---
+            menuBar.addEventListener('mousemove', (e) => {
+                const menuBarRect = menuBar.getBoundingClientRect();
+                
+                // --- 1. 3D Tilt Logic ---
+                const mouseX = e.clientX - menuBarRect.left;
+                const mouseY = e.clientY - menuBarRect.top;
+                const tiltX = (mouseY / menuBarRect.height - 0.5) * -15; // Max 15deg tilt
+                const tiltY = (mouseX / menuBarRect.width - 0.5) * 15;
+                menuBar.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+
+                // --- 2. Glare Effect Logic ---
+                const glareX = (mouseX / menuBarRect.width) * 100;
+                const glareY = (mouseY / menuBarRect.height) * 100;
+                blurPill.style.setProperty('--glare-x', `${glareX}%`);
+                blurPill.style.setProperty('--glare-y', `${glareY}%`);
+
+                // --- 3. Magnetic Docking Logic ---
+                const hoveredItem = e.target.closest('.menu-item');
+                if (hoveredItem) {
+                    // --- DOCKED STATE ---
+                    if (hoveredItem !== currentActiveItem) {
+                        // Remove active class from old item
+                        if (currentActiveItem) currentActiveItem.classList.remove('active');
+                        // Add to new item
+                        hoveredItem.classList.add('active');
+                        currentActiveItem = hoveredItem;
+                    }
+                    
+                    const itemRect = hoveredItem.getBoundingClientRect();
+                    blurPill.style.left = `${itemRect.left - menuBarRect.left}px`;
+                    blurPill.style.width = `${itemRect.width}px`;
+
+                } else {
+                    // --- GLIDING STATE --- (Pill follows mouse)
+                    if (currentActiveItem) currentActiveItem.classList.remove('active');
+                    currentActiveItem = null;
+
+                    const pillWidth = 50; // A fixed width for the pill when gliding
+                    blurPill.style.left = `${mouseX - pillWidth / 2}px`;
+                    blurPill.style.width = `${pillWidth}px`;
+                }
+
+                // Make pill visible on first move
+                if (blurPill.style.opacity === '0') {
+                    blurPill.style.opacity = '1';
+                }
+            });
+
+            // --- Mouseleave Listener to reset everything ---
+            menuBar.addEventListener('mouseleave', () => {
+                // Reset tilt
+                menuBar.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                
+                // Reset pill to the last active item or hide it
+                if (currentActiveItem) {
+                    const itemRect = currentActiveItem.getBoundingClientRect();
+                    const menuBarRect = menuBar.getBoundingClientRect();
+                    blurPill.style.left = `${itemRect.left - menuBarRect.left}px`;
+                    blurPill.style.width = `${itemRect.width}px`;
+                } else {
+                    blurPill.style.opacity = '0';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
